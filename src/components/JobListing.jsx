@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const JobListing = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [searchQuery, setSearchQuery] = useState(""); // State for the search query
   const navigate = useNavigate(); // Initialize useNavigate
 
   useEffect(() => {
@@ -41,13 +42,32 @@ const JobListing = () => {
       </div>
     );
   }
+
   const handleNavigate = (user) => {
     navigate("/user-details", { state: { user } }); // Navigate with state
   };
 
+  // Filter users based on the search query for Staff ID
+  const filteredUsers = users.filter(
+    (user) => user.staff_id?.toLowerCase().includes(searchQuery.toLowerCase()) // Safely check if staff_id exists
+  );
+
   return (
     <div className="container mx-auto mt-10">
       <h1 className="text-2xl font-bold mb-5 text-center">Users List</h1>
+
+      {/* Search Input */}
+      <div className="mb-5 text-center">
+        <input
+          type="text"
+          placeholder="Search by Staff ID"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)} // Update search query state
+          className="border border-gray-300 p-2 rounded w-1/3"
+        />
+      </div>
+
+      {/* User Table */}
       <table className="min-w-full bg-white border border-gray-300">
         <thead>
           <tr>
@@ -60,7 +80,7 @@ const JobListing = () => {
           </tr>
         </thead>
         <tbody>
-          {users.map((user, index) => (
+          {filteredUsers.map((user, index) => (
             <tr key={user.id}>
               <td className="py-2 px-4 border-b text-center">{index + 1}</td>
               <td className="py-2 px-4 border-b text-center">
@@ -74,32 +94,6 @@ const JobListing = () => {
                 {user.email_address}
               </td>
               <td className="py-2 px-4 border-b text-center">
-                {/* <button
-                  className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 transition duration-300"
-                  onClick={() =>
-                    alert(`Details for ${user.firstname} ${user.surname}`)
-                  }
-                >
-                  Details
-                </button> */}
-
-                {/* <Link
-                  to={`/${user.staff_id}`}
-                  className="bg-red-500 text-white px-4 py-2 rounded hover:bg-blue-700 transition duration-300"
-                >
-                  Details
-                </Link> */}
-
-                {/* <Link
-                  to={{
-                    pathname: "/user-details",
-                    state: { users },
-                  }}
-                  className="bg-red-500 text-white px-4 py-2 rounded hover:bg-blue-700 transition duration-300"
-                >
-                  Details
-                </Link> */}
-
                 <button
                   onClick={() => handleNavigate(user)} // Call the navigate function on button click
                   className="bg-red-500 text-white px-4 py-2 rounded hover:bg-blue-700 transition duration-300"
